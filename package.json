@@ -1,0 +1,27 @@
+{
+  "name": "full-stack-open-2020-osa3",
+  "version": "1.0.0",
+  "description": "[Link to course materials](https://fullstackopen.com/osa3)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marhyvar/full-stack-open-2020-osa3.git"
+  },
+  "author": "M. Hyvarinen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marhyvar/full-stack-open-2020-osa3/issues"
+  },
+  "homepage": "https://github.com/marhyvar/full-stack-open-2020-osa3#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
