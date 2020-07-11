@@ -53,18 +53,26 @@ app.delete('/api/persons/:id', (req, res) => {
     res.status(204).end()
 })
 
-app.post('/api/persons', (req, res) => {
-    let randomId
-    let found = false
-    do {
-        randomId = Math.floor(Math.random()*1000000)
-        found = persons.find(p => p.id === randomId)
-    } while (found)
+app.post('/api/persons', (req, res) => {   
     const newPerson = req.body
-    console.log(req.body)
-    newPerson.id = randomId
-    persons = persons.concat(newPerson)
-    res.json(newPerson)
+    console.log('body', req.body)
+    if (!newPerson.name || !newPerson.number) {
+        return res.status(400).json({
+            error: 'missing name or number'
+        })
+    } else if (persons.find(p => p.name === newPerson.name)) {
+        return res.status(403).json({
+            error: 'name must be unique'
+        })
+    } else {
+        let randomId
+        do {
+            randomId = Math.floor(Math.random()*1000000)
+        } while (persons.find(p => p.id === randomId))
+        newPerson.id = randomId
+        persons = persons.concat(newPerson)
+        res.json(newPerson)
+    }
 })
 
 app.get('/info', (req, res) => {
