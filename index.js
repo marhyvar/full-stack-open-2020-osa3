@@ -1,4 +1,5 @@
 const express = require('express')
+const { response } = require('express')
 const app = express()
 
 const PORT = 3001
@@ -50,6 +51,20 @@ app.delete('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id)
     persons = persons.filter(p => p.id !== id)
     res.status(204).end()
+})
+
+app.post('/api/persons', (req, res) => {
+    let randomId
+    let found = false
+    do {
+        randomId = Math.floor(Math.random()*1000000)
+        found = persons.find(p => p.id === randomId)
+    } while (found)
+    const newPerson = req.body
+    console.log(req.body)
+    newPerson.id = randomId
+    persons = persons.concat(newPerson)
+    res.json(newPerson)
 })
 
 app.get('/info', (req, res) => {
