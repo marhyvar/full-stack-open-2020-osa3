@@ -28,6 +28,7 @@ app.use(morgan(function (tokens, req, res) {
       tokens.person(req, res)
     ].join(' ')
 }))
+app.use(express.static('build'))
 
 let persons = [
     { 
@@ -51,10 +52,6 @@ let persons = [
         id: 4
       }
 ]
-
-app.get('/', (req, res) => {
-    res.send('<h1>Phonebook server</h2>')
-})
 
 app.get('/api/persons', (req, res) => {
     res.json(persons)
