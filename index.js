@@ -55,21 +55,23 @@ let persons = [
       }
 ]
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(people => {
         res.json(people)
     })
-    //res.json(persons)
+    .catch(error => { next(error)})
 })
 
-app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(p => p.id === id)
-    if (person) {
-        res.json(person)
-    } else {
-        res.status(404).end()
-    }
+app.get('/api/persons/:id', (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person => {
+            if (person) {
+                res.json(person.toJSON())
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => { next(error)})
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
@@ -78,14 +80,10 @@ app.delete('/api/persons/:id', (req, res, next) => {
             res.status(204).end()
         })
         .catch(error => next(error))
-    /*const id = Number(req.params.id)
-    persons = persons.filter(p => p.id !== id)
-    res.status(204).end()*/
 })
 
 app.post('/api/persons', (req, res) => {   
     const newPerson = req.body
-    console.log('body', req.body)
     if (!newPerson.name || !newPerson.number) {
         return res.status(400).json({
             error: 'missing name or number'
@@ -100,19 +98,6 @@ app.post('/api/persons', (req, res) => {
     person.save().then(savedPerson => {
         res.json(savedPerson.toJSON())
     })
-    /*else if (persons.find(p => p.name === newPerson.name)) {
-        return res.status(403).json({
-            error: 'name must be unique'
-        })
-    } else {
-        let randomId
-        do {
-            randomId = Math.floor(Math.random()*1000000)
-        } while (persons.find(p => p.id === randomId))
-        newPerson.id = randomId
-        persons = persons.concat(newPerson)
-        res.json(newPerson)
-    }*/
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -130,10 +115,13 @@ app.put('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
-    res.send(`<p>Phonebook has 
-    info for ${persons.length} people</p>
-    <p>${new Date()}</p>`)
+app.get('/info', (req, res, next) => {
+    Person.find({}).then(result => {
+        res.send(`<p>Phonebook has 
+        info for ${result.length} people</p>
+        <p>${new Date()}</p>`)
+    }) 
+    .catch(error => { next(error)})  
 })
 
 const errorEndpoint = (req, res) => {
