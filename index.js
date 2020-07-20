@@ -17,6 +17,7 @@ morgan.token('person', function(req, res) {
 })
 
 app.use(cors())
+app.use(express.static('build'))
 app.use(express.json())
 // app.use(morgan('tiny'))
 // https://github.com/expressjs/morgan
@@ -30,7 +31,6 @@ app.use(morgan(function (tokens, req, res) {
       tokens.person(req, res)
     ].join(' ')
 }))
-app.use(express.static('build'))
 
 let persons = [
     { 
@@ -72,11 +72,12 @@ app.get('/api/persons/:id', (req, res) => {
     }
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndRemove(req.params.id)
         .then(result => {
             res.status(204).end()
         })
+        .catch(error => next(error))
     /*const id = Number(req.params.id)
     persons = persons.filter(p => p.id !== id)
     res.status(204).end()*/
@@ -120,7 +121,23 @@ app.get('/info', (req, res) => {
     <p>${new Date()}</p>`)
 })
 
+const errorEndpoint = (req, res) => {
+    res.status(404).send({ error: 'this endpoint does not exist'})
+}
+
+app.use(errorEndpoint)
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message)
+    if (error.name === 'CastError' && error.kind == 'ObjectId')
+        return res.status(400).send({ error: 'malformatted id'})
+    next(error)
+}
+
+app.use(errorHandler)
+
 const PORT = process.env.PORT
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
